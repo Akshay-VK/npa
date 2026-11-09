@@ -1,0 +1,20 @@
+# Heavy / generated (live on ext4 via symlinks, never committed)
+/.venv
+/data
+/vendor
+/runs
+/logs
+/code/__pycache__
+code/__pycache__/
+npa/**/__pycache__/
+tests/__pycache__/
+*.pyc
+*.pth
+*.pt
+*.egg-info/
+.pytest_cache/
+# Secrets
+.env
+# OS
+.DS_Store
+Thumbs.db

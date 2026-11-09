@@ -1,0 +1,6 @@
+# Example: V0 oracle. Copy and edit.
+seed: 0
+world: harmonic
+model: {kind: oracle}
+train: {steps: 1000, batch: 64, lr: 1e-3}
+eval: [force_mae]
