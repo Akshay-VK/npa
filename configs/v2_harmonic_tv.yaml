@@ -1,0 +1,6 @@
+seed: 0
+world: harmonic_tv
+model: {kind: v2_energy, hidden: 32}
+train: {steps: 3000, batch: 64, lr: 1e-3, n_steps: 5000, n_traj: 3, traj_len: 1000}
+eval: [energy_mae, rollout_drift]
+name: v2_harmonic_tv

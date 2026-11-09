@@ -1,0 +1,6 @@
+seed: 0
+world: two_channel
+model: {kind: v2_energy, hidden: 32}
+train: {steps: 5000, batch: 64, lr: 1e-3, n_steps: 3000}
+eval: [energy_mae, barrier_error, rollout_drift]
+name: v2_twocannel

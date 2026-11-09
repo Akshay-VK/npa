@@ -1,0 +1,6 @@
+seed: 0
+world: harmonic
+model: {kind: v1_direct, hidden: 32}
+train: {steps: 3000, batch: 64, lr: 1e-3, n_steps: 2000}
+eval: [force_mae, rollout_drift]
+name: v1_harmonic
