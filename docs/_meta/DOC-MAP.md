@@ -90,6 +90,9 @@ Status legend: `[ ]` not written · `[~]` drafted · `[x]` reviewed.
 | 07.07 | `07-delivery/07-g1-g2-results.md` | G1 and G2 results: loop closes, state does not help (preliminary negative). |
 | 07.08 | `07-delivery/08-g2b-results.md` | G2b results: non-conservative dynamics, state does not help. |
 | 07.09 | `07-delivery/09-g2c-results.md` | G2c results: multi-particle works, perception helps, state doesn't. |
+| 07.10 | `07-delivery/10-g2d-g3-plan.md` | G2d design and the three G3 running options, with the decision rule. |
+| 07.11 | `07-delivery/11-g2d-results.md` | G2d results: state carries partial phase information but does not beat the stateless baseline reliably. |
+| 07.12 | `07-delivery/12-g3-results.md` | G3 results: distance-MLP trained on CCSD(T)/cc-pVDZ passes the H + H₂ barrier, invariance and 20 Å dissociation gate; MP2 control fails. |
 
 ## 08 — Risk
 
