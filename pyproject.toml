@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "npa"
+version = "0.0.0"
+description = "Energy-based Neural Particle Automata for fast, stable, reactive molecular dynamics."
+requires-python = ">=3.10"
+dependencies = ["torch", "numpy", "pyyaml", "tqdm"]
+
+[project.scripts]
+npa = "npa.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["npa*"]
