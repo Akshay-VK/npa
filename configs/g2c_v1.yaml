@@ -1,0 +1,7 @@
+seed: 0
+world: multiparticle
+n_particles: 16
+model: {kind: npa_official, state_dims: 16, hidden_dims: 128}
+train: {steps: 500, rollout_steps: 8, lr: 1e-3, batch: 1}
+eval: [rollout_drift, energy_drift]
+name: g2c_v1

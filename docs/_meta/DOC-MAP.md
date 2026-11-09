@@ -88,6 +88,8 @@ Status legend: `[ ]` not written · `[~]` drafted · `[x]` reviewed.
 | 07.05 | `07-delivery/05-g0-foundations-result.md` | Execution log for G0: measured hardware limits and the first reproduction result. |
 | 07.06 | `07-delivery/06-g1-g2-design-questions.md` | Design decisions for G1/G2: toy world, budget, thresholds. |
 | 07.07 | `07-delivery/07-g1-g2-results.md` | G1 and G2 results: loop closes, state does not help (preliminary negative). |
+| 07.08 | `07-delivery/08-g2b-results.md` | G2b results: non-conservative dynamics, state does not help. |
+| 07.09 | `07-delivery/09-g2c-results.md` | G2c results: multi-particle works, perception helps, state doesn't. |
 
 ## 08 — Risk
 
