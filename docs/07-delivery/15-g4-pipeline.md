@@ -13,8 +13,9 @@ depends_on: [14-g4-plan.md, ../03-method-design/03-symmetry-equivariance-and-con
   mock HDF5 that mirrors the real Transition1x schema exactly.
 - 14 tests pass: mock schema, loader, filter, split, barrier/reaction energy,
   MD5 helper, model invariance, force consistency, smoke train.
-- The real-data run is one command after the 6.6 GB download. No real numbers
-  exist yet; the mock numbers are not a result.
+- A final real-data run on `Transition1x_mid.h5` now exists (see Baseline
+  comparison): barrier MAE 106.1 kcal/mol, reaction energy MAE 91.4 kcal/mol,
+  force MAE 3.10 eV/Å. The mock numbers are still not a result.
 
 > **In plain words.** The plumbing works on a fake dataset. You can load a real
 > reaction, train a small model, and compute the barrier error today, as soon as
@@ -102,6 +103,24 @@ comparison needs more epochs, larger models, and target normalisation.
   roadmap's "reaction family" wording is reconciled in `14-g4-plan.md`.
 - Force MAE on the mock is not comparable to the G3 force numbers (different
   systems, different units).
+
+## Baseline comparison
+
+Final G4 run on `Transition1x_mid.h5` (50 epochs, 8 frames, hidden 512):
+`runs/g4_final/metrics.json`.
+
+| Method | Barrier MAE (kcal/mol) | Reaction energy MAE (kcal/mol) | Force MAE (eV/Å) |
+|---|---|---|---|
+| Our model (G4 final) | 106.1 | 91.4 | 3.10 |
+| Dataset reference (wB97x/6-31G(d) labels) | 0 (by definition) | 0 (by definition) | 0 (by definition) |
+| MACE (published) | ~0.5-1.1 | not reported | not reported |
+
+Published MACE numbers are from the 2026 HAT-in-peptides work
+(DOI 10.1038/s41524-026-02335-z; PMC13054793) and MACEPre-DeePEST
+(chemrxiv DOI 10.26434/chemrxiv.15009333/v1). Our model is not competitive
+with these published potentials on barrier MAE. The contribution of this work
+is the end-to-end pipeline (data loading, filtering, training, metrics), not
+the accuracy of this small baseline model.
 
 ## Sources
 
