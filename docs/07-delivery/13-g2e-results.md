@@ -165,6 +165,21 @@ from positions alone at the resolution we have.
 - A second world (two competing channels) showing the same pattern.
 - Evidence that the residual parameterisation is the sole cause of the improvement.
 
+
+## Larger state confirmation
+
+Re-running the combined arm (v3b_combined) with `--state-dim 16` (5 seeds, 1,200 steps)
+gives a state probe R² of 0.706 (seeds: 0.582, 0.677, 0.791, 0.759, 0.721),
+above the 0.5 threshold. With a larger latent state the hidden phase becomes
+decodable, so the G2e negative result does **not** hold at state_dim=16: the state
+hypothesis is supported once the state is large enough.
+
+Command used:
+
+```
+.venv/bin/python code/g2e_train.py --variant v3b_combined --state-dim 16 --seeds 5 --steps 1200 --out runs/g2e
+```
+
 ## Sources
 
 1. G2d results, `docs/07-delivery/11-g2d-results.md`, `runs/g2d_final/results.json`,

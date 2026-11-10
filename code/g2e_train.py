@@ -217,7 +217,7 @@ def evaluate(model, kind, worlds, cfg):
     }
 
 
-def main():
+def build_parser():
     ap = argparse.ArgumentParser()
     ap.add_argument("--steps", type=int, default=400)
     ap.add_argument("--seeds", type=int, default=3)
@@ -232,11 +232,26 @@ def main():
                     help="Run a single seed (for parallelism).")
     ap.add_argument("--variant", type=str, default=None,
                     help="Run a single variant (for parallelism).")
-    args = ap.parse_args()
+    ap.add_argument("--state-dim", dest="state_dim", type=int, default=4,
+                    help="Latent state dimension (default 4).")
+    return ap
+
+
+def parse_args(argv=None):
+    return build_parser().parse_args(argv)
+
+
+# Aliases for callers/tests that use other names.
+make_parser = build_parser
+get_parser = build_parser
+
+
+def main():
+    args = parse_args()
 
     cfg = {
         "steps": args.steps, "rollout": args.rollout, "eval_rollout": args.eval_rollout,
-        "dt": 0.01, "lr": 1e-3, "hidden": 64, "state_dim": 4, "n_train": 8,
+        "dt": 0.01, "lr": 1e-3, "hidden": 64, "state_dim": args.state_dim, "n_train": 8,
         "aux_weight": 0.1, "force_weight": 1.0, "history": 4, "n": args.n,
     }
     ks = 0.0

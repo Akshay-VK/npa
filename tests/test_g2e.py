@@ -83,3 +83,15 @@ class TestG2eArms(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestG2eCLI(unittest.TestCase):
+    def test_state_dim_flag_default(self):
+        from code.g2e_train import build_parser
+        args = build_parser().parse_args([])
+        self.assertEqual(args.state_dim, 4)
+
+    def test_state_dim_flag_override(self):
+        from code.g2e_train import build_parser
+        args = build_parser().parse_args(["--state-dim", "16"])
+        self.assertEqual(args.state_dim, 16)
