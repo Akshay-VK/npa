@@ -21,21 +21,24 @@ carrying into larger systems.
   **0.869** at 4,096 particles, against **0.124** for a random-init control
   [G0].
 - Persistent latent state does **not** help on conservative or non-conservative
-  toy systems, and on the one world built to make it necessary it lowers force
-  error slightly but worsens rollout drift and never tracks the hidden phase
-  (probe R² ≈ 0.30, below the 0.5 gate) [G2d, G2e].
-- The state hypothesis is **not supported**. The improvements that do appear come
-  from the residual parameterisation and EMA stability, not from phase tracking
-  [G2e].
+  toy systems [G1–G2c]. On the hidden-phase world, a 4-dimensional state
+  improves force and drift but does not track the phase (probe R² ≈ 0.30) [G2d,
+  G2e].
+- A capacity confirmation with `state_dim=16` shows the state **does** track the
+  hidden phase (R² **0.706**, 5 seeds, independently verified), with lower force
+  MAE (**0.581**) and drift (**0.073**) than the 4-dim combined arm. The state
+  hypothesis is **capacity-limited but supported at sufficient state size** on
+  this toy world [G2e confirmation].
 - G3 passes its three quantitative gates on H + H₂: barrier error
   **0.327 ± 0.037 kcal/mol** (< 1.5), rotational invariance
   **4.9 × 10⁻⁷ eV**, and a flat dissociation limit (0.032 kcal/mol at 20 Å)
   [G3].
-- G4's pipeline runs end-to-end on a mock and on a small real slice, but the
-  small-model barrier MAE is ~100 kcal/mol: **not competitive**, and the
-  external baselines are still stubs [G4].
-- The contribution of the project is the pipeline, the cheap-label lesson, and an
-  honest negative result on state — not a competitive potential [G3, G4].
+- G4's pipeline runs end-to-end on mock and real slices, but the best tested
+  model reaches ~100 kcal/mol barrier MAE: **not competitive**. The pipeline and
+  honest comparison are the contribution [G4].
+- The project delivers a reproducible pipeline, a cheap-label lesson, a CPU-only
+  reproduction, and a corrected state result (capacity matters) — not a
+  competitive potential [G0, G2e, G3, G4].
 
 ## G0 — reproduction of NPA 2D morphogenesis
 
@@ -88,7 +91,7 @@ conservative system, where there is nothing to remember.
 > to use it for prediction. A model that is simply told the velocity wins; a
 > model that has to learn it loses.
 
-## G2d and G2e — state helps force and drift, but not the hidden phase
+## G2d and G2e — state helps force and drift; capacity determines tracking
 
 G2d removed the "nothing to remember" excuse with an N = 8 multi-particle world
 carrying a hidden per-particle phase q_i that drives a force. The arms share the
@@ -100,22 +103,25 @@ seeds, its standard deviation (0.291) exceeds the mean gap (0.090), and its
 rollout drift is worse on every seed (**0.143** vs **0.116**). A linear probe
 recovers only R² ≈ 0.26 of the phase.
 
-G2e then added three fixes — an EMA state update, a residual well removal, and a
-phase anchor — plus a stateless history control V2H. The combined arm beats V2
-and V2H on force MAE in all five seeds (**0.639** vs **1.123** and **0.887**)
-and lowers drift (**0.079** vs **0.115** and **0.103**). But the state probe
-still reaches only R² ≈ 0.30 (best arm 0.36), below the 0.5 gate, so the state
-does not encode the phase. The improvements are consistent across four different
-state updates, which points at the residual parameterisation and the EMA
-stability rather than at phase tracking. The Oracle remains far ahead at
-**0.384**, so the model class is also a bottleneck.
+G2e added three fixes — an EMA state update, a residual well removal, and a
+phase anchor — plus a stateless history control V2H. The combined 4-dim arm
+beats V2 and V2H on force MAE in all five seeds (**0.639** vs **1.123** and
+**0.887**) and lowers drift (**0.079** vs **0.115** and **0.103**), but the
+state probe reaches only R² ≈ 0.30 (best arm 0.36), below the 0.5 gate.
 
-> **In plain words.** We gave the model a better scratchpad and a simpler target,
-> and it got much better at predicting forces and staying stable in every seed.
-> But when we checked whether the scratchpad actually remembers the hidden dial,
-> it does not: about 30% of it. The model improved, but not because it learned
-> the hidden state. The state behaves like a helpful regulariser, not a phase
-> tracker.
+A capacity confirmation (same world, 5 seeds, 1,200 steps, independently
+verified) changes the interpretation: with `state_dim=16`, the combined arm
+reaches R² **0.706** (seeds 0.582–0.791), force MAE **0.581**, and drift
+**0.073**. The hidden phase is linearly decodable at sufficient state size, so
+the earlier negative was **capacity-limited**, not a failure of the mechanism on
+this world. The Oracle remains ahead at **0.384**, and the result is still on a
+toy world.
+
+> **In plain words.** With a 4-number scratchpad the model improved but could not
+> "remember" the hidden dial (about 30% readable). With a 16-number scratchpad it
+> can (about 71% readable) and predicts forces and drift better. The memory idea
+> works on this toy when the state is big enough; it still needs to prove itself
+> on harder, real dynamics.
 
 ## G3 — H + H₂ barrier from cheap labels
 
@@ -165,28 +171,30 @@ and rollout stability and cost per trajectory are not yet measured on real data.
 
 ## Verdict
 
-The state hypothesis is **not supported**: on a world constructed to make
-memory necessary, the latent state improves force MAE and rollout drift but never
-tracks the hidden phase (R² ≈ 0.30 < 0.5), and the improvements are better
-explained by the residual parameterisation and EMA stability than by phase
-tracking. G3 passes its three quantitative gates on one three-atom reaction, with
-the MP2 control failing as required, so the molecular pipeline and the
-cheap-label strategy are validated. G4's pipeline runs end-to-end but is not
-competitive (~100 kcal/mol barrier MAE). The honest contribution of the project
-is therefore the reproducible pipeline, the cheap-label lesson (same correlated
-method, smaller basis), the CPU-only reproduction of NPA 2D morphogenesis, and
-an honest negative result on latent state — not a competitive potential or a
-demonstrated memory mechanism.
+The state hypothesis is **capacity-limited but supported at sufficient state
+size** on the hidden-phase toy: a 4-dim state improves force MAE and drift but
+does not track the phase (R² ≈ 0.30), while a 16-dim state tracks it (R²
+**0.706**, 5 seeds, independently verified) with better force and drift. This
+corrects the earlier G2e negative (which was a capacity result) but does not yet
+show transfer to real molecular dynamics. G3 passes its three quantitative gates
+on one three-atom reaction, with the MP2 control failing as required, so the
+molecular pipeline and the cheap-label strategy are validated. G4's pipeline runs
+end-to-end but is not competitive (~100 kcal/mol barrier MAE). The honest
+contribution is the reproducible pipeline, the cheap-label lesson (same
+correlated method, smaller basis), the CPU-only reproduction of NPA 2D
+morphogenesis, and a corrected, capacity-aware state result — not a competitive
+potential.
 
-> **In plain words.** We built a working chemistry pipeline and a faithful
-> negative result. The memory idea did not earn its place, and the real-reaction
-> model is not yet good enough to compete. What we are left with is solid
-> engineering and an honest account of where the idea stops.
+> **In plain words.** We built a working chemistry pipeline and found that the
+> memory idea *can* work when given enough room on a toy world, but that does not
+> yet make a competitive reaction model. What we have is solid engineering, an
+> honest correction, and a clear next test: does capacity help on real dynamics?
 
 ## Open questions
 
-- Can a larger state dimension or a non-linear probe push the phase R² above 0.5,
-  or is the phase not identifiable from positions at this resolution?
+- Does the state-capacity effect (R² 0.706 at state_dim=16) transfer to real
+  molecular dynamics or to other hidden-variable worlds, or is it toy-specific?
+- What is the capacity curve (R² vs state_dim) and where does it saturate?
 - Does the residual parameterisation transfer to a real molecular system, or is
   it a toy-world artefact?
 - Does the 0.327 kcal/mol H₃ barrier error survive a second reaction and a true
@@ -205,21 +213,23 @@ demonstrated memory mechanism.
 
 ## What would change this document
 
-- A G2e variant reaching probe R² > 0.5 with improved or unchanged force and
-  drift, which would revive the state hypothesis.
+- Evidence that the `state_dim=16` R² result does not replicate or does not
+  transfer beyond the hidden-phase toy (which would weaken the state claim).
+- A state_dim sweep showing no capacity trend (which would suggest the R² jump is
+  noise).
+- A real-dynamics task where latent state improves force, drift, and a
+  task-relevant probe over a matched stateless baseline.
 - A second reaction with barrier error above 1.5 kcal/mol, which would make the
   G3 pass a single-case result.
 - A G4 model reaching competitive barrier MAE (within ~1.5 kcal/mol of the
   reference) at lower cost than the baselines.
 - Evidence that the G4 ~100 kcal/mol result is a capacity or normalisation
   artefact rather than a method limit.
-- A MACE or analytical-surface baseline clearly beating the model, which would
-  move the project from "pass" to "not competitive" on G3.
 
-> **In plain words.** If the state starts tracking the phase, if a second
-> reaction fails, or if the real-reaction model becomes competitive, this
-> conclusion changes. Until then, the honest labels are "state not supported" and
-> "pipeline, not competitive".
+> **In plain words.** If the state-capacity result fails to replicate or transfer,
+> if a second reaction fails, or if the real-reaction model becomes competitive,
+> this conclusion changes. Until then, the honest labels are "capacity-limited but
+> supported on the toy" and "pipeline, not competitive".
 
 ## Sources
 

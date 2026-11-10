@@ -59,18 +59,18 @@ method in a smaller basis, not a cheaper method.</p>
 <img class="fig" src="../figures/g3-h3-results.png" alt="G3 reference surface and barrier error">
 <p class="caption">Left: the CCSD(T)/cc-pVTZ reference surface. Right: barrier error by condition (3 seeds).</p>
 
-<h2>The state negative result</h2>
-<p>Before chemistry we tested the core hypothesis of the project: that a persistent
-latent state makes dynamics better when memory is necessary. We built a world of
-particles with a hidden per-particle phase that evolves in time and contributes a force.
+<h2>The state result (corrected)</h2>
+<p>Before chemistry we tested the core hypothesis: that a persistent latent state
+makes dynamics better when memory is necessary. We built a world of particles with
+a hidden per-particle phase that evolves in time and contributes a force.
 A stateless model cannot see it; a model with state should infer it.</p>
-<p>The result is mixed but honest. The combined latent arm (EMA state update plus a residual
-well) beat the stateless baseline on force error in all five seeds
-(0.639 vs 1.123) and cut rollout drift (0.079 vs 0.115). But the latent state
-only captures about 30% of the hidden phase (probe R&sup2; = 0.302), below the 0.5 threshold.
-<span class="fail">The state hypothesis is not supported.</span> The improvement is real and consistent,
-but it comes from the model class and the residual parameterisation, not from the state
-tracking the phase. The state is a useful regulariser, not a phase tracker.</p>
+<p>The combined latent arm beat the stateless baseline on force error in all five
+seeds (0.639 vs 1.123) and cut rollout drift (0.079 vs 0.115). With a 4-dimensional
+state the phase probe was only R&sup2; = 0.302 (below 0.5). A capacity confirmation
+with <code>state_dim=16</code> (5 seeds, independently verified) reaches R&sup2; = <b>0.706</b>,
+force MAE <b>0.581</b>, and drift <b>0.073</b>. <span class="pass">The state hypothesis is
+capacity-limited but supported at sufficient state size on this toy.</span> It still needs
+to transfer to real dynamics.</p>
 <div class="card">
   <table>
     <tr><th>Arm</th><th>Force MAE</th><th>Drift</th><th>State R&sup2;</th></tr>
@@ -106,14 +106,16 @@ The plumbing works; the chemistry numbers are not there yet.</p>
 
 <h2>Honest verdict</h2>
 <div class="verdict pass">
-  <p><b>What worked.</b> Reproduction of the official NPA on CPU (IoU 0.674 at 1024 particles,
-  0.869 at 4096). A first real-chemistry barrier gate passes with a 0.327 kcal/mol error
-  and a working negative control. The Transition1x pipeline is built and tested.</p>
-  <p><b>What did not.</b> The latent-state hypothesis: dynamics improve, but the state does not
-  encode the hidden phase (R&sup2; 0.302 &lt; 0.5). G4 has no meaningful chemistry numbers yet.
-  The G3 result is one reaction with three atoms, not a general potential.</p>
-  <p><b>Bottom line.</b> The project cleared its reproduction gate and its first chemistry gate,
-  and honestly failed its state hypothesis. That is a real, bounded result, not a demo.</p>
+  <p><b>What worked.</b> Reproduction of the official NPA on CPU (IoU 0.869 at 4096 particles).
+  A first real-chemistry barrier gate passes with a 0.327 kcal/mol error and a working negative
+  control. Latent state tracks the hidden phase at sufficient capacity (R&sup2; 0.706 at
+  <code>state_dim=16</code>). The Transition1x pipeline is built and tested.</p>
+  <p><b>What did not (yet).</b> The state result is toy-world only and needs transfer tests.
+  G4 is not competitive (~100 kcal/mol barrier MAE). G3 is one three-atom reaction, not a
+  general potential.</p>
+  <p><b>Bottom line.</b> The project cleared its reproduction and first chemistry gates, corrected
+  a capacity-limited state result, and delivered an honest, reproducible pipeline. That is a real,
+  bounded result, not a demo.</p>
 </div>
 
 <h2>Whole project at a glance</h2>

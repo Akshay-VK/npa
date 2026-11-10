@@ -97,6 +97,8 @@ Status legend: `[ ]` not written · `[~]` drafted · `[x]` reviewed.
 | 07.14 | `07-delivery/14-g4-plan.md` | G4 plan: Transition1x pipeline, model, metrics, baselines, phases, pass/fail. |
 | 07.15 | `07-delivery/15-g4-pipeline.md` | G4 pipeline: mock-tested loader/model/training, exact post-download commands, limitations. |
 | 07.16 | `07-delivery/notes/transition1x-download.md` | Transition1x download instructions: exact commands, checksum, size, resume, verification, slicing. |
+| 07.17 | `07-delivery/16-project-synthesis.md` | Project synthesis: full G0–G4 narrative, corrected capacity-aware state result, and honest verdict. |
+| 07.18 | `07-delivery/blog/index.html` | Blog-ready HTML story with hero, infographic, and embedded figures. |
 
 ## 08 — Risk
 

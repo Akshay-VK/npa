@@ -114,11 +114,11 @@ def infographic():
 
     # G2e
     ax = fig.add_subplot(gs[1])
-    ax.set_title("G2e  Latent state: dynamics improve, state does not track phase",
+    ax.set_title("G2e  Latent state: capacity-limited, tracks phase at dim 16",
                  fontsize=12, fontweight="bold", loc="left")
-    arms = ["V2\nstateless", "V2H\nhistory", "V3b-combined", "Oracle"]
-    vals = [1.123, 0.887, 0.639, 0.384]
-    colors = ["#9ca3af", "#9ca3af", "#f59e0b", "#10b981"]
+    arms = ["V2\nstateless", "V2H\nhistory", "V3b-comb\ndim 4", "V3b-comb\ndim 16", "Oracle"]
+    vals = [1.123, 0.887, 0.639, 0.581, 0.384]
+    colors = ["#9ca3af", "#9ca3af", "#f59e0b", "#8b5cf6", "#10b981"]
     x = np.arange(len(arms))
     ax.bar(x, vals, color=colors, alpha=0.85, edgecolor="black", linewidth=0.8)
     for xi, v in zip(x, vals):
@@ -126,8 +126,8 @@ def infographic():
     ax.set_xticks(x)
     ax.set_xticklabels(arms, fontsize=9)
     ax.set_ylabel("force MAE")
-    ax.set_ylim(0, 1.3)
-    ax.text(0.98, 0.6, "Drift: 0.079 vs 0.115\nState probe R2 = 0.302 (need >0.5)\nState is a regulariser, not a phase tracker.",
+    ax.set_ylim(0, 1.35)
+    ax.text(0.98, 0.55, "State probe R²: 0.302 (dim 4) → 0.706 (dim 16)\nDrift: 0.079 → 0.073\nSupported at sufficient capacity (toy world).",
             transform=ax.transAxes, ha="right", va="center", fontsize=9, color="#4b5563")
 
     # G3

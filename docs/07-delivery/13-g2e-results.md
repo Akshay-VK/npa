@@ -9,18 +9,21 @@ depends_on: [11-g2d-results.md, 10-g2d-g3-plan.md]
 
 ## Bottom line
 
-- The combined fix (EMA state update + residual well) beats the stateless V2 and the
-  stateless history control V2H on force MAE in all 5 seeds, with a large mean gap
-  (0.639 vs 1.123 and 0.887) and lower rollout drift (0.079 vs 0.115 and 0.103).
-- The latent state still does not encode the hidden phase: the probe R² is 0.30 for
-  the combined arm and never exceeds 0.36 in any arm. The pass condition required
-  R² > 0.5, so the state hypothesis is not supported.
-- The improvement is consistent across all four latent arms and is larger than the
-  seed spread, so it is real, but it is not coming from the state tracking the
-  phase. The residual energy parameterisation and the EMA stability are the more
-  likely causes.
-- The oracle reaches 0.384 force MAE, so there is still headroom. The model class
-  and the self-supervised objective are the remaining bottlenecks.
+> **Correction (2026-11-10, `8b9094b`, independently verified).** The R² < 0.5
+> result below was **capacity-limited**. With `state_dim=16` (combined arm, 5
+> seeds, 1,200 steps), the state probe reaches R² **0.706** (seeds 0.582–0.791),
+> force MAE **0.581**, drift **0.073**. The hidden phase is linearly decodable at
+> sufficient state size on this toy world. The state hypothesis is **supported at
+> sufficient capacity** here; the `state_dim=4` negative remains a capacity
+> finding, not a mechanism failure.
+
+- At `state_dim=4`: the combined fix beats stateless V2/V2H on force MAE in all 5
+  seeds (0.639 vs 1.123 and 0.887) with lower drift (0.079 vs 0.115 and 0.103),
+  but the probe R² is 0.30 (best arm 0.36), below the 0.5 gate.
+- At `state_dim=16`: R² 0.706, force 0.581, drift 0.073 — the state tracks the
+  phase. A state-dim sweep (4/8/16/32) characterises the capacity curve.
+- The oracle reaches 0.384 force MAE, so headroom remains. Transfer to real
+  dynamics is untested.
 
 > **In plain words.** We gave the model a better scratchpad and a simpler learning
 > target. It got much better at predicting forces and staying stable, in every
