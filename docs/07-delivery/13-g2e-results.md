@@ -20,8 +20,7 @@ depends_on: [11-g2d-results.md, 10-g2d-g3-plan.md]
 - At `state_dim=4`: the combined fix beats stateless V2/V2H on force MAE in all 5
   seeds (0.639 vs 1.123 and 0.887) with lower drift (0.079 vs 0.115 and 0.103),
   but the probe R² is 0.30 (best arm 0.36), below the 0.5 gate.
-- At `state_dim=16`: R² 0.706, force 0.581, drift 0.073 — the state tracks the
-  phase. A state-dim sweep (4/8/16/32) characterises the capacity curve.
+- Capacity sweep (4/8/16/32): R² 0.302→0.503→0.706→0.861, force 0.639→0.599→0.581→0.527, drift 0.079→0.071→0.073→0.068 — threshold crossed at dim 8.
 - The oracle reaches 0.384 force MAE, so headroom remains. Transfer to real
   dynamics is untested.
 
@@ -169,18 +168,31 @@ from positions alone at the resolution we have.
 - Evidence that the residual parameterisation is the sole cause of the improvement.
 
 
-## Larger state confirmation
+## Larger state confirmation and capacity sweep
 
-Re-running the combined arm (v3b_combined) with `--state-dim 16` (5 seeds, 1,200 steps)
-gives a state probe R² of 0.706 (seeds: 0.582, 0.677, 0.791, 0.759, 0.721),
-above the 0.5 threshold. With a larger latent state the hidden phase becomes
-decodable, so the G2e negative result does **not** hold at state_dim=16: the state
-hypothesis is supported once the state is large enough.
+Capacity sweep (combined arm, 5 seeds, 1,200 steps each, same world):
 
-Command used:
+| state_dim | Force MAE | Rollout drift | State R² |
+|---:|---:|---:|---:|
+| 4  | 0.639 | 0.079 | 0.302 |
+| 8  | 0.599 | 0.071 | 0.503 |
+| 16 | 0.581 | 0.073 | 0.706 |
+| 32 | 0.527 | 0.068 | 0.861 |
+
+R² crosses the 0.5 threshold at `state_dim=8` and increases monotonically to
+0.861 at 32, with force MAE and drift improving alongside. The hidden phase is
+linearly decodable at sufficient state size; the earlier negative was
+capacity-limited.
+
+![G2e capacity sweep](figures/g2e-capacity-sweep.png)
+
+Commands:
 
 ```
-.venv/bin/python code/g2e_train.py --variant v3b_combined --state-dim 16 --seeds 5 --steps 1200 --out runs/g2e
+.venv/bin/python code/g2e_train.py --variant v3b_combined --state-dim 4  --seeds 5 --steps 1200 --out runs/g2e_sweep/sd4
+.venv/bin/python code/g2e_train.py --variant v3b_combined --state-dim 8  --seeds 5 --steps 1200 --out runs/g2e_sweep/sd8
+.venv/bin/python code/g2e_train.py --variant v3b_combined --state-dim 16 --seeds 5 --steps 1200 --out runs/g2e_sweep/sd16
+.venv/bin/python code/g2e_train.py --variant v3b_combined --state-dim 32 --seeds 5 --steps 1200 --out runs/g2e_sweep/sd32
 ```
 
 ## Sources

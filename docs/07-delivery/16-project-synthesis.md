@@ -109,13 +109,15 @@ beats V2 and V2H on force MAE in all five seeds (**0.639** vs **1.123** and
 **0.887**) and lowers drift (**0.079** vs **0.115** and **0.103**), but the
 state probe reaches only R² ≈ 0.30 (best arm 0.36), below the 0.5 gate.
 
-A capacity confirmation (same world, 5 seeds, 1,200 steps, independently
-verified) changes the interpretation: with `state_dim=16`, the combined arm
-reaches R² **0.706** (seeds 0.582–0.791), force MAE **0.581**, and drift
-**0.073**. The hidden phase is linearly decodable at sufficient state size, so
-the earlier negative was **capacity-limited**, not a failure of the mechanism on
-this world. The Oracle remains ahead at **0.384**, and the result is still on a
-toy world.
+A capacity sweep (same world, 5 seeds, 1,200 steps each) changes the
+interpretation: R² is **0.302** at dim 4, **0.503** at dim 8, **0.706** at dim 16,
+and **0.861** at dim 32, with force MAE **0.639→0.599→0.581→0.527** and drift
+**0.079→0.071→0.073→0.068**. The hidden phase is linearly decodable once the
+state is large enough, so the earlier negative was **capacity-limited**, not a
+failure of the mechanism on this world. The Oracle remains ahead at **0.384**,
+and the result is still on a toy world.
+
+![G2e capacity sweep](figures/g2e-capacity-sweep.png)
 
 > **In plain words.** With a 4-number scratchpad the model improved but could not
 > "remember" the hidden dial (about 30% readable). With a 16-number scratchpad it

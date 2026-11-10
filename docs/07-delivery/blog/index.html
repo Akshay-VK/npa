@@ -66,11 +66,13 @@ a hidden per-particle phase that evolves in time and contributes a force.
 A stateless model cannot see it; a model with state should infer it.</p>
 <p>The combined latent arm beat the stateless baseline on force error in all five
 seeds (0.639 vs 1.123) and cut rollout drift (0.079 vs 0.115). With a 4-dimensional
-state the phase probe was only R&sup2; = 0.302 (below 0.5). A capacity confirmation
-with <code>state_dim=16</code> (5 seeds, independently verified) reaches R&sup2; = <b>0.706</b>,
-force MAE <b>0.581</b>, and drift <b>0.073</b>. <span class="pass">The state hypothesis is
-capacity-limited but supported at sufficient state size on this toy.</span> It still needs
-to transfer to real dynamics.</p>
+state the phase probe was only R&sup2; = 0.302 (below 0.5). A capacity sweep shows
+the phase becomes linearly decodable as state grows: R&sup2; <b>0.503</b> at dim 8,
+<b>0.706</b> at dim 16, <b>0.861</b> at dim 32, with force MAE and drift improving.
+<span class="pass">The state hypothesis is capacity-limited but supported at sufficient
+state size on this toy.</span> It still needs to transfer to real dynamics.</p>
+<img class="fig" src="../figures/g2e-capacity-sweep.png" alt="G2e capacity sweep">
+<p class="caption">State probe R² crosses 0.5 at dim 8 and reaches 0.86 at dim 32 (5 seeds each).</p>
 <div class="card">
   <table>
     <tr><th>Arm</th><th>Force MAE</th><th>Drift</th><th>State R&sup2;</th></tr>
