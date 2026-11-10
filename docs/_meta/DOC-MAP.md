@@ -93,6 +93,10 @@ Status legend: `[ ]` not written · `[~]` drafted · `[x]` reviewed.
 | 07.10 | `07-delivery/10-g2d-g3-plan.md` | G2d design and the three G3 running options, with the decision rule. |
 | 07.11 | `07-delivery/11-g2d-results.md` | G2d results: state carries partial phase information but does not beat the stateless baseline reliably. |
 | 07.12 | `07-delivery/12-g3-results.md` | G3 results: distance-MLP trained on CCSD(T)/cc-pVDZ passes the H + H₂ barrier, invariance and 20 Å dissociation gate; MP2 control fails. |
+| 07.13 | `07-delivery/13-g2e-results.md` | G2e results: state-fix ablations (EMA, residual, combined) and the stateless history control on the hidden-phase world. |
+| 07.14 | `07-delivery/14-g4-plan.md` | G4 plan: Transition1x pipeline, model, metrics, baselines, phases, pass/fail. |
+| 07.15 | `07-delivery/15-g4-pipeline.md` | G4 pipeline: mock-tested loader/model/training, exact post-download commands, limitations. |
+| 07.16 | `07-delivery/notes/transition1x-download.md` | Transition1x download instructions: exact commands, checksum, size, resume, verification, slicing. |
 
 ## 08 — Risk
 
