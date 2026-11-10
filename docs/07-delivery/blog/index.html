@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NPA: from reproduction to a chemistry gate</title>
+<style>
+  :root { --fg:#1f2937; --muted:#4b5563; --accent:#3b82f6; --pass:#10b981; --fail:#dc2626; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         color: var(--fg); max-width: 880px; margin: 0 auto; padding: 24px 20px 64px; line-height: 1.55; }
+  h1 { font-size: 2.1rem; line-height: 1.15; margin: 0 0 8px; }
+  h2 { font-size: 1.35rem; margin-top: 36px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; }
+  h3 { font-size: 1.05rem; margin-top: 20px; color: var(--muted); }
+  p { margin: 10px 0; }
+  .subtitle { color: var(--muted); font-size: 1.05rem; margin-bottom: 20px; }
+  .hero { width: 100%; border-radius: 10px; box-shadow: 0 4px 18px rgba(0,0,0,.08); margin: 16px 0 8px; }
+  .fig { width: 100%; border-radius: 8px; margin: 12px 0; border: 1px solid #e5e7eb; }
+  .caption { font-size: 0.85rem; color: var(--muted); margin: -4px 0 16px; }
+  .card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+  .metric { display: inline-block; margin: 4px 10px 4px 0; }
+  .metric b { font-size: 1.05rem; }
+  .pass { color: var(--pass); font-weight: 700; }
+  .fail { color: var(--fail); font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.9rem; }
+  th, td { border: 1px solid #e5e7eb; padding: 6px 8px; text-align: left; }
+  th { background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+  .verdict { background: #fef2f2; border-left: 4px solid var(--fail); padding: 12px 16px; border-radius: 6px; }
+  .verdict.pass { background: #ecfdf5; border-left-color: var(--pass); }
+  img { max-width: 100%; height: auto; }
+</style>
+</head>
+<body>
+
+<h1>NPA: from reproduction to a chemistry gate</h1>
+<p class="subtitle">A small, honest research blog: we reproduced a neural particle automaton,
+tested whether latent state helps, and passed a first real-chemistry barrier gate.</p>
+
+<img class="hero" src="../figures/blog-hero.png" alt="G3 hero: barrier pass and MP2 control fail">
+
+<h2>Headline result</h2>
+<p>The G3 gate asks whether a model trained on <em>cheap</em> electronic-structure labels
+can predict the barrier of the simplest reaction in chemistry, H + H<sub>2</sub> &rarr; H<sub>2</sub> + H.
+The reference is our own CCSD(T)/cc-pVTZ value of <b>10.010 kcal/mol</b>.
+A distance-MLP trained on CCSD(T)/cc-pVDZ labels predicts <b>9.683 &plusmn; 0.037 kcal/mol</b>,
+an error of <b>0.327 &plusmn; 0.037</b> against a gate of <b>1.5</b>. <span class="pass">Pass.</span></p>
+<p>The same model trained on MP2/cc-pVTZ labels predicts <b>13.023 &plusmn; 0.270</b>,
+an error of <b>3.013</b>, which fails the gate <span class="fail">as it must</span>.
+That negative control is the point: the cheap level has to be the same correlated
+method in a smaller basis, not a cheaper method.</p>
+<div class="card">
+  <div class="metric"><b>Reference barrier</b> 10.010 kcal/mol</div>
+  <div class="metric"><b>Cheap model</b> 9.683 &plusmn; 0.037</div>
+  <div class="metric"><b>Error</b> 0.327 &lt; 1.5 <span class="pass">PASS</span></div>
+  <div class="metric"><b>MP2 control</b> 13.023, err 3.013 <span class="fail">FAIL (designed)</span></div>
+  <div class="metric"><b>Rotation invariance</b> 1.1&times;10<sup>-5</sup> <span class="pass">PASS</span></div>
+  <div class="metric"><b>Dissociation (20 &Aring;)</b> 0.031 <span class="pass">PASS</span></div>
+</div>
+<img class="fig" src="../figures/g3-h3-results.png" alt="G3 reference surface and barrier error">
+<p class="caption">Left: the CCSD(T)/cc-pVTZ reference surface. Right: barrier error by condition (3 seeds).</p>
+
+<h2>The state negative result</h2>
+<p>Before chemistry we tested the core hypothesis of the project: that a persistent
+latent state makes dynamics better when memory is necessary. We built a world of
+particles with a hidden per-particle phase that evolves in time and contributes a force.
+A stateless model cannot see it; a model with state should infer it.</p>
+<p>The result is mixed but honest. The combined latent arm (EMA state update plus a residual
+well) beat the stateless baseline on force error in all five seeds
+(0.639 vs 1.123) and cut rollout drift (0.079 vs 0.115). But the latent state
+only captures about 30% of the hidden phase (probe R&sup2; = 0.302), below the 0.5 threshold.
+<span class="fail">The state hypothesis is not supported.</span> The improvement is real and consistent,
+but it comes from the model class and the residual parameterisation, not from the state
+tracking the phase. The state is a useful regulariser, not a phase tracker.</p>
+<div class="card">
+  <table>
+    <tr><th>Arm</th><th>Force MAE</th><th>Drift</th><th>State R&sup2;</th></tr>
+    <tr><td>V2 stateless</td><td>1.123</td><td>0.115</td><td>&mdash;</td></tr>
+    <tr><td>V2H history</td><td>0.887</td><td>0.103</td><td>&mdash;</td></tr>
+    <tr><td>V3b-combined</td><td><b>0.639</b></td><td><b>0.079</b></td><td>0.302</td></tr>
+    <tr><td>Oracle (true phase)</td><td>0.384</td><td>0.066</td><td>&mdash;</td></tr>
+  </table>
+</div>
+<img class="fig" src="../figures/g2e-results.png" alt="G2e results">
+<p class="caption">Force MAE, rollout drift, and state-probe R&sup2; by arm (5 seeds).</p>
+
+<h2>The chemistry gate pass</h2>
+<p>G3 is the first real-chemistry gate. We generated the H<sub>3</sub> reference surface
+with PySCF (CCSD(T)/cc-pVTZ) and trained a small model on cheap labels.
+The gate is three quantitative criteria: barrier error under 1.5 kcal/mol,
+rotational invariance under 10<sup>-4</sup> eV, and a flat 20 &Aring; dissociation limit.
+All three pass. The cheap level must be the same correlated method in a smaller basis
+(CCSD(T)/cc-pVDZ, barrier 10.154); truly cheaper methods get the shape wrong
+(MP2 13.264, UHF 17.494, B3LYP 4.238).</p>
+<img class="fig" src="../figures/model-schematic.png" alt="Model schematic">
+<p class="caption">The ReactivePairEnergy model: element-conditioned pairwise distances, E(3)-invariant.</p>
+
+<h2>The pipeline</h2>
+<p>G4 builds the data pipeline for Transition1x: loader, filter, split, barrier and reaction-energy
+helpers, an E(3)-invariant pairwise model with autograd forces, training CLI, and tests.
+Fourteen tests pass on a mock HDF5 that mirrors the real schema exactly.
+On a small real slice the model learns slowly (barrier MAE ~99&ndash;117 kcal/mol),
+which is expected: the atomization-energy scale is ~3000 eV and the model is tiny.
+The plumbing works; the chemistry numbers are not there yet.</p>
+<img class="fig" src="../figures/g4-pipeline.png" alt="G4 pipeline">
+<p class="caption">G4 mock-slice barrier MAE (not a chemistry result).</p>
+
+<h2>Honest verdict</h2>
+<div class="verdict pass">
+  <p><b>What worked.</b> Reproduction of the official NPA on CPU (IoU 0.674 at 1024 particles,
+  0.869 at 4096). A first real-chemistry barrier gate passes with a 0.327 kcal/mol error
+  and a working negative control. The Transition1x pipeline is built and tested.</p>
+  <p><b>What did not.</b> The latent-state hypothesis: dynamics improve, but the state does not
+  encode the hidden phase (R&sup2; 0.302 &lt; 0.5). G4 has no meaningful chemistry numbers yet.
+  The G3 result is one reaction with three atoms, not a general potential.</p>
+  <p><b>Bottom line.</b> The project cleared its reproduction gate and its first chemistry gate,
+  and honestly failed its state hypothesis. That is a real, bounded result, not a demo.</p>
+</div>
+
+<h2>Whole project at a glance</h2>
+<img class="fig" src="../figures/blog-infographic.png" alt="Project infographic">
+
+<footer style="margin-top:40px;color:#9ca3af;font-size:0.8rem;">
+  Neural Particle Automata for atomistic reaction dynamics. Figures generated with matplotlib.
+  HTML is self-contained; open this file directly in a browser.
+</footer>
+
+</body>
+</html>
